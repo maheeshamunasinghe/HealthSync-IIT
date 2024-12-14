@@ -7,7 +7,7 @@ def test_patient_operations():
     # Step 1: Add a new patient
     data = {
     "appointment_date": "2024-12-09",
-    "appointment_status": "Scheduled",
+    "status": "Scheduled",
     "appointment_time": "19:30",
     "doctor_id": "1",
     "patient_id": "2",
