@@ -131,6 +131,7 @@ jobs:
         pip install pytest
         pip install requests
         pytest tests/test_patient.py --maxfail=1 --disable-warnings
+        pkill -f 'kubectl port-forward'
 
     - name: Port-forward Green Service for Testing Doctors
       run: |
@@ -145,6 +146,7 @@ jobs:
         pip install pytest
         pip install requests
         pytest tests/test_doctor.py --maxfail=1 --disable-warnings
+        pkill -f 'kubectl port-forward'
 
     - name: Port-forward Green Service for Testing appointment
       run: |
@@ -159,6 +161,7 @@ jobs:
         pip install pytest
         pip install requests
         pytest tests/appointment_service.py --maxfail=1 --disable-warnings
+        pkill -f 'kubectl port-forward'
   
   deploy:
     needs: deploy-green
