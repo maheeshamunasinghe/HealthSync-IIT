@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appointment-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: appointment-service
+  template:
+    metadata:
+      labels:
+        app: appointment-service
+    spec:
+      containers:
+      - name: appointment-service
+        image: registry.digitalocean.com/healthsynccontainer/appointment-service:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: AWS_REGION
+          value: "ap-southeast-1"  # DynamoDB region (adjust to your region)
+        - name: DYNAMODB_TABLE_NAME
+          value: "appointments"  # DynamoDB table name for appointments
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-secrets
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-secrets
+              key: AWS_SECRET_ACCESS_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appointment-service
+spec:
+  selector:
+    app: appointment-service
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5002
+  type: ClusterIP

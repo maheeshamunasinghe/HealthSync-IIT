@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doctor-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: doctor-service
+  template:
+    metadata:
+      labels:
+        app: doctor-service
+    spec:
+      containers:
+      - name: doctor-service
+        image: registry.digitalocean.com/healthsynccontainer/doctor-service:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: DB_HOST
+          value: "healthsync-db.cfiqoygw47no.ap-southeast-1.rds.amazonaws.com"
+        - name: DB_USER
+          value: "tharinduMaheesha"
+        - name: DB_PASSWORD
+          value: "Robertpwd3789"
+        - name: DB_NAME
+          value: "healthsync"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: doctor-service
+spec:
+  selector:
+    app: doctor-service
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5001
+  type: ClusterIP
