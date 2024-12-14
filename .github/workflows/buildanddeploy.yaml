@@ -126,6 +126,10 @@ jobs:
     - name: Run Tests for Green
       working-directory: ./patient-record-service
       run: |
+        python -m venv venv 
+        source venv/bin/activate
+        pip install pytest
+        pip install requests
         pytest tests/test_patient.py --maxfail=1 --disable-warnings
   
   deploy:
