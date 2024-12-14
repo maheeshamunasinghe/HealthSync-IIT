@@ -19,29 +19,29 @@ spec:
         - containerPort: 80
       imagePullSecrets:
       - name: do-secret
-        env:
-        - name: AWS_REGION
-          value: "ap-southeast-1"  # DynamoDB region (adjust to your region)
-        - name: DYNAMODB_TABLE_NAME
-          value: "appointments"  # DynamoDB table name for notifications
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: aws-secrets
-              key: AWS_ACCESS_KEY_ID
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: aws-secrets
-              key: AWS_SECRET_ACCESS_KEY
-        - name: DB_HOST
-          value: "healthsync-db.cfiqoygw47no.ap-southeast-1.rds.amazonaws.com"
-        - name: DB_USER
-          value: "tharinduMaheesha"
-        - name: DB_PASSWORD
-          value: "Robertpwd3789"
-        - name: DB_NAME
-          value: "healthsync"
+      env:
+      - name: AWS_REGION
+        value: "ap-southeast-1"  # DynamoDB region (adjust to your region)
+      - name: DYNAMODB_TABLE_NAME
+        value: "appointments"  # DynamoDB table name for notifications
+      - name: AWS_ACCESS_KEY_ID
+        valueFrom:
+          secretKeyRef:
+            name: aws-secrets
+            key: AWS_ACCESS_KEY_ID
+      - name: AWS_SECRET_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            name: aws-secrets
+            key: AWS_SECRET_ACCESS_KEY
+      - name: DB_HOST
+        value: "healthsync-db.cfiqoygw47no.ap-southeast-1.rds.amazonaws.com"
+      - name: DB_USER
+        value: "tharinduMaheesha"
+      - name: DB_PASSWORD
+        value: "Robertpwd3789"
+      - name: DB_NAME
+        value: "healthsync"
 
 ---
 apiVersion: v1
