@@ -25,7 +25,6 @@ def add_appointment():
     reason = data['reason']
     status = data['status']
     
-    # Extract year, month, and day from appointment date
     appointment_date_obj = datetime.strptime(appointment_date, "%Y-%m-%d")
     year = appointment_date_obj.year
     month = appointment_date_obj.month
