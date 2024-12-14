@@ -15,8 +15,6 @@ spec:
       containers:
       - name: patient-service
         image: registry.digitalocean.com/healthsynccontainer/patient-service:latest
-      imagePullSecrets:
-      - name: docker-registry
         ports:
         - containerPort: 80
         env:
