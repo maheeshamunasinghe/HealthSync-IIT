@@ -40,7 +40,7 @@ def add_patient():
     try:
         # Insert into patients table
         cursor.execute(
-            "INSERT INTO patients (name, age, gender, address , email , contact) VALUES (%s, %s, %s, %s) RETURNING id",
+            "INSERT INTO patients (name, age, gender, address , email , contact) VALUES (%s, %s, %s, %s ,%s,%s) RETURNING id",
             (name, age, gender, address , email , contact)
         )
         patient_id = cursor.fetchone()[0]
