@@ -59,9 +59,9 @@ jobs:
         run: |
           docker build -t registry.digitalocean.com/healthsynccontainer/notification-service:green ./notification-service
           docker push registry.digitalocean.com/healthsynccontainer/notification-service:green
-
-  deploy:
-    needs: build-and-push  # Ensures that deployment happens only after the build job succeeds
+  
+  deploy-blue:
+    needs: build-and-push
     runs-on: ubuntu-latest
 
     steps:
@@ -90,10 +90,36 @@ jobs:
         kubectl apply -f patient-record-service/k8s/patient-service-deployment-blue.yaml
         kubectl apply -f yamals/ingress-blue.yaml
 
+  deploy-green:
+    needs: deploy-blue  # Ensures that deployment happens only after the build job succeeds
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
     - name: Apply Kubernetes Manifests green
       run: |
         kubectl apply -f appointment-service/k8s/appointment-service-deployment-green.yaml
         kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-green.yaml
         kubectl apply -f notification-service/k8s/notification-service-deployment-green.yaml
         kubectl apply -f patient-record-service/k8s/patient-service-deployment-green.yaml
-        kubectl apply -f yamals/ingress-green.yaml
+
+    - name: Port-forward Green Service for Testing
+      run: |
+        kubectl port-forward service/patient-service-green 8080:80 &
+        sleep 5  # Wait for port-forward to establish
+
+    - name: Run Tests for Green
+      working-directory: ./patient-record-service
+      run: |
+        pytest tests/test_patient.py --maxfail=1 --disable-warnings
+  
+  deploy:
+    needs: deploy-green
+    runs-on: ubuntu-latest
+    if: success()  # Only runs if tests pass
+    steps:
+      - name: Deploy Green Ingress
+        run: |
+          kubectl apply -f ingress-green.yaml 

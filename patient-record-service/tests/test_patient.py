@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "http://localhost:5000"  # Update with your service URL
+BASE_URL = "http://localhost:8080"  # Update with your service URL
 
 
 def test_patient_operations():
