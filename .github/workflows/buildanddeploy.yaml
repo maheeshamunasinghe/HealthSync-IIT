@@ -83,12 +83,12 @@ jobs:
 
     - name: Apply Kubernetes Manifests blue
       run: |
-        kubectl apply -f k8s/aws-secrets.yaml
+        kubectl apply -f yamals/aws-secrets.yaml
         kubectl apply -f appointment-service/k8s/appointment-service-deployment-blue.yaml
         kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-blue.yaml
         kubectl apply -f notification-service/k8s/notification-service-deployment-blue.yaml
         kubectl apply -f patient-record-service/k8s/patient-service-deployment-blue.yaml
-        kubectl apply -f k8s/ingress-blue.yaml
+        kubectl apply -f yamals/ingress-blue.yaml
 
     - name: Apply Kubernetes Manifests green
       run: |
@@ -96,4 +96,4 @@ jobs:
         kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-green.yaml
         kubectl apply -f notification-service/k8s/notification-service-deployment-green.yaml
         kubectl apply -f patient-record-service/k8s/patient-service-deployment-green.yaml
-        kubectl apply -f k8s/ingress-green.yaml
+        kubectl apply -f yamals/ingress-green.yaml
