@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: appointment-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: appointment-service
@@ -15,6 +15,8 @@ spec:
       containers:
       - name: appointment-service
         image: registry.digitalocean.com/healthsynccontainer/appointment-service:latest
+      imagePullSecrets:
+      - name: do-secret
         ports:
         - containerPort: 80
         env:
