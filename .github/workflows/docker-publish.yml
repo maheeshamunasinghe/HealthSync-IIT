@@ -1,0 +1,40 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Log in to DigitalOcean container registry
+      - name: Log in to DigitalOcean
+        run: echo "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" | docker login registry.digitalocean.com -u doctl --password-stdin
+
+      # Build and push each service
+      - name: Build and push service1
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/patient-service ./patient-record-service
+          docker push registry.digitalocean.com/healthsynccontainer/patient-service
+
+      - name: Build and push service2
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/doctor-service ./doctor-record-service
+          docker push registry.digitalocean.com/healthsynccontainer/doctor-service
+
+      - name: Build and push service3
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/appointment-service ./appointment-service
+          docker push registry.digitalocean.com/healthsynccontainer/appointment-service
+
+      - name: Build and push service4
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/notification-service ./notification-service
+          docker push registry.digitalocean.com/healthsynccontainer/notification-service
