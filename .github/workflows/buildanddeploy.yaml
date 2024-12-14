@@ -118,12 +118,12 @@ jobs:
         kubectl apply -f notification-service/k8s/notification-service-deployment-green.yaml
         kubectl apply -f patient-record-service/k8s/patient-service-deployment-green.yaml
 
-    - name: Port-forward Green Service for Testing
+    - name: Port-forward Green Service for Testing Patients
       run: |
         kubectl port-forward service/patient-service-green 8080:80 &
         sleep 5  # Wait for port-forward to establish
 
-    - name: Run Tests for Green
+    - name: Run Tests for patients
       working-directory: ./patient-record-service
       run: |
         python -m venv venv 
@@ -131,6 +131,34 @@ jobs:
         pip install pytest
         pip install requests
         pytest tests/test_patient.py --maxfail=1 --disable-warnings
+
+    - name: Port-forward Green Service for Testing Doctors
+      run: |
+        kubectl port-forward service/doctor-service-green 8080:80 &
+        sleep 5  # Wait for port-forward to establish
+
+    - name: Run Tests for doctors
+      working-directory: ./doctor-record-service
+      run: |
+        python -m venv venv 
+        source venv/bin/activate
+        pip install pytest
+        pip install requests
+        pytest tests/test_doctor.py --maxfail=1 --disable-warnings
+
+    - name: Port-forward Green Service for Testing appointment
+      run: |
+        kubectl port-forward service/appointment-service-green 8080:80 &
+        sleep 5  # Wait for port-forward to establish
+
+    - name: Run Tests for doctors
+      working-directory: ./appointment-service
+      run: |
+        python -m venv venv 
+        source venv/bin/activate
+        pip install pytest
+        pip install requests
+        pytest tests/appointment_service.py --maxfail=1 --disable-warnings
   
   deploy:
     needs: deploy-green
@@ -139,4 +167,4 @@ jobs:
     steps:
       - name: Deploy Green Ingress
         run: |
-          kubectl apply -f ingress-green.yaml 
+          kubectl apply -f yamals/ingress-green.yaml 
