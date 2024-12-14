@@ -42,7 +42,7 @@ def test_patient_operations():
     # Step 3: View the patient using the patient_id
     response = requests.get(f"{BASE_URL}/patients/view/{patient_id}")
     assert response.status_code == 200  # Ensure we get a valid response
-    assert response.json().get("name") == "John Doe"  # Ensure the data is correct
+    assert response.json().get("name") == "Testing"  # Ensure the data is correct
 
     # Step 4: Delete the patient using the patient_id
     response = requests.delete(f"{BASE_URL}/patients/delete/{patient_id}")
