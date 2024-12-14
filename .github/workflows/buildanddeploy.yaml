@@ -98,6 +98,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Set up doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Set up kubeconfig
+      run: doctl kubernetes cluster kubeconfig save k8s-1-31-1-do-5-sgp1-1734158660661
+
     - name: Apply Kubernetes Manifests green
       run: |
         kubectl apply -f appointment-service/k8s/appointment-service-deployment-green.yaml
@@ -105,15 +118,15 @@ jobs:
         kubectl apply -f notification-service/k8s/notification-service-deployment-green.yaml
         kubectl apply -f patient-record-service/k8s/patient-service-deployment-green.yaml
 
-    # - name: Port-forward Green Service for Testing
-    #   run: |
-    #     kubectl port-forward service/patient-service-green 8080:80 &
-    #     sleep 5  # Wait for port-forward to establish
+    - name: Port-forward Green Service for Testing
+      run: |
+        kubectl port-forward service/patient-service-green 8080:80 &
+        sleep 5  # Wait for port-forward to establish
 
-    # - name: Run Tests for Green
-    #   working-directory: ./patient-record-service
-    #   run: |
-    #     pytest tests/test_patient.py --maxfail=1 --disable-warnings
+    - name: Run Tests for Green
+      working-directory: ./patient-record-service
+      run: |
+        pytest tests/test_patient.py --maxfail=1 --disable-warnings
   
   deploy:
     needs: deploy-green
