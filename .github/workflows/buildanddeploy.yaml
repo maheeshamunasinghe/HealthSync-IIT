@@ -40,7 +40,7 @@ jobs:
           docker push registry.digitalocean.com/healthsynccontainer/notification-service
 
   deploy:
-    needs: build  # Ensures that deployment happens only after the build job succeeds
+    needs: build-and-push  # Ensures that deployment happens only after the build job succeeds
     runs-on: ubuntu-latest
 
     steps:
