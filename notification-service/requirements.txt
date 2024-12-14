@@ -1,0 +1,4 @@
+flask
+datetime
+psycopg2-binary
+boto3
