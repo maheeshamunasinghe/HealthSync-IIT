@@ -17,8 +17,6 @@ spec:
         image: registry.digitalocean.com/healthsynccontainer/appointment-service:latest
         ports:
         - containerPort: 80
-        imagePullSecrets:
-        - name: do-secret
         env:
         - name: AWS_REGION
           value: "ap-southeast-1"  # DynamoDB region (adjust to your region)
@@ -34,6 +32,8 @@ spec:
             secretKeyRef:
               name: aws-secrets
               key: AWS_SECRET_ACCESS_KEY
+      imagePullSecrets:
+      - name: do-secret
 
 ---
 apiVersion: v1

@@ -17,8 +17,6 @@ spec:
         image: registry.digitalocean.com/healthsynccontainer/patient-service:latest
         ports:
         - containerPort: 80
-        imagePullSecrets:
-        - name: do-secret
         env:
         - name: DB_HOST
           value: "healthsync-db.cfiqoygw47no.ap-southeast-1.rds.amazonaws.com"
@@ -28,6 +26,8 @@ spec:
           value: "Robertpwd3789"
         - name: DB_NAME
           value: "healthsync"
+      imagePullSecrets:
+      - name: do-secret
 
 ---
 apiVersion: v1
