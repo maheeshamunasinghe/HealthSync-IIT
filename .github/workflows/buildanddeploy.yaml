@@ -153,7 +153,7 @@ jobs:
         kubectl port-forward service/appointment-service-green 8080:80 &
         sleep 5  # Wait for port-forward to establish
 
-    - name: Run Tests for doctors
+    - name: Run Tests for appointments
       working-directory: ./appointment-service
       run: |
         python -m venv venv 
