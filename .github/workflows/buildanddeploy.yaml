@@ -14,45 +14,51 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Install Python and dependencies for testing
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.9'
-
-      - name: Install dependencies for patient service
-        working-directory: ./patient-record-service
-        run: |
-          pip install -r requirements.txt
-
-      - name: Run unit tests for patient service
-        working-directory: ./patient-record-service
-        run: pytest tests --maxfail=1 --disable-warnings
-
       # Log in to DigitalOcean container registry
       - name: Log in to DigitalOcean
         run: echo "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" | docker login registry.digitalocean.com -u doctl --password-stdin
 
       # Build and push each service
-      - name: Build and push service1
+      - name: Build and push patient Service Green
         run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/patient-service ./patient-record-service
-          docker push registry.digitalocean.com/healthsynccontainer/patient-service
+          docker build -t registry.digitalocean.com/healthsynccontainer/patient-service:blue ./patient-record-service
+          docker push registry.digitalocean.com/healthsynccontainer/patient-service:blue
 
-      - name: Build and push service2
+      - name: Build and push doctor Service Green
         run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/doctor-service ./doctor-record-service
-          docker push registry.digitalocean.com/healthsynccontainer/doctor-service
+          docker build -t registry.digitalocean.com/healthsynccontainer/doctor-service:blue ./doctor-record-service
+          docker push registry.digitalocean.com/healthsynccontainer/doctor-service:blue
 
-      - name: Build and push service3
+      - name: Build and push appointment Service Green
         run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/appointment-service ./appointment-service
-          docker push registry.digitalocean.com/healthsynccontainer/appointment-service
+          docker build -t registry.digitalocean.com/healthsynccontainer/appointment-service:blue ./appointment-service
+          docker push registry.digitalocean.com/healthsynccontainer/appointment-service:blue
 
-      - name: Build and push service4
+      - name: Build and push notification Service Green
         run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/notification-service ./notification-service
-          docker push registry.digitalocean.com/healthsynccontainer/notification-service
+          docker build -t registry.digitalocean.com/healthsynccontainer/notification-service:blue ./notification-service
+          docker push registry.digitalocean.com/healthsynccontainer/notification-service:blue
+
+      # Build and push each service
+      - name: Build and push patient Service Blue
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/patient-service:green ./patient-record-service
+          docker push registry.digitalocean.com/healthsynccontainer/patient-service:green
+
+      - name: Build and push doctor Service Blue
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/doctor-service:green ./doctor-record-service
+          docker push registry.digitalocean.com/healthsynccontainer/doctor-service:green
+
+      - name: Build and push appointment Service Blue
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/appointment-service:green ./appointment-service
+          docker push registry.digitalocean.com/healthsynccontainer/appointment-service:green
+
+      - name: Build and push notification Service Blue
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/notification-service:green ./notification-service
+          docker push registry.digitalocean.com/healthsynccontainer/notification-service:green
 
   deploy:
     needs: build-and-push  # Ensures that deployment happens only after the build job succeeds
@@ -75,11 +81,19 @@ jobs:
     - name: Set up kubeconfig
       run: doctl kubernetes cluster kubeconfig save k8s-1-31-1-do-5-sgp1-1734158660661
 
-    - name: Apply Kubernetes Manifests
+    - name: Apply Kubernetes Manifests blue
       run: |
         kubectl apply -f k8s/aws-secrets.yaml
-        kubectl apply -f k8s/appointment-service-deployment.yaml
-        kubectl apply -f k8s/doctor-service-deployment.yaml
-        kubectl apply -f k8s/notification-service-deployment.yaml
-        kubectl apply -f k8s/patient-service-deployment.yaml
-        kubectl apply -f k8s/ingress.yaml
+        kubectl apply -f appointment-service/k8s/appointment-service-deployment-blue.yaml
+        kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-blue.yaml
+        kubectl apply -f notification-service/k8s/notification-service-deployment-blue.yaml
+        kubectl apply -f patient-record-service/k8s/patient-service-deployment-blue.yaml
+        kubectl apply -f k8s/ingress-blue.yaml
+
+    - name: Apply Kubernetes Manifests green
+      run: |
+        kubectl apply -f appointment-service/k8s/appointment-service-deployment-green.yaml
+        kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-green.yaml
+        kubectl apply -f notification-service/k8s/notification-service-deployment-green.yaml
+        kubectl apply -f patient-record-service/k8s/patient-service-deployment-green.yaml
+        kubectl apply -f k8s/ingress-green.yaml

@@ -1,20 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: patient-service
+  name: patient-service-blue
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: patient-service
+      version: blue
   template:
     metadata:
       labels:
         app: patient-service
+        version: blue
+
     spec:
       containers:
       - name: patient-service
-        image: registry.digitalocean.com/healthsynccontainer/patient-service:latest
+        image: registry.digitalocean.com/healthsynccontainer/patient-service:blue
         ports:
         - containerPort: 80
         env:
@@ -33,10 +36,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: patient-service
+  name: patient-service-blue
 spec:
   selector:
     app: patient-service
+    version: blue
   ports:
   - protocol: TCP
     port: 80
