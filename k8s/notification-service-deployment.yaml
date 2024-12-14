@@ -15,10 +15,10 @@ spec:
       containers:
       - name: notification-service
         image: registry.digitalocean.com/healthsynccontainer/notification-service:latest
-      imagePullSecrets:
-      - name: do-secret
         ports:
         - containerPort: 80
+      imagePullSecrets:
+      - name: do-secret
         env:
         - name: AWS_REGION
           value: "ap-southeast-1"  # DynamoDB region (adjust to your region)
