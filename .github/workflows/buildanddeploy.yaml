@@ -160,7 +160,7 @@ jobs:
         source venv/bin/activate
         pip install pytest
         pip install requests
-        pytest tests/appointment_service.py --maxfail=1 --disable-warnings
+        pytest tests/appointment_test.py --maxfail=1 --disable-warnings
         pkill -f 'kubectl port-forward'
   
   deploy:
