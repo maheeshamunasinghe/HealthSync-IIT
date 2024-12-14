@@ -31,6 +31,6 @@ jobs:
         kubectl apply -f k8s/appointment-service-deployment.yaml
         kubectl apply -f k8s/doctor-service-deployment.yaml
         kubectl apply -f k8s/notification-service-deployment.yaml
-        kubectl apply -f k8s/patient-service-deployment.yaml.yaml
+        kubectl apply -f k8s/patient-service-deployment.yaml
         kubectl apply -f k8s/aws-secrets.yaml
         kubectl apply -f k8s/ingress.yaml
