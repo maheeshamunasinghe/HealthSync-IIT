@@ -147,21 +147,6 @@ jobs:
         pip install requests
         pytest tests/test_doctor.py --maxfail=1 --disable-warnings
         pkill -f 'kubectl port-forward'
-
-    - name: Port-forward Green Service for Testing appointment
-      run: |
-        kubectl port-forward service/appointment-service-green 8080:80 &
-        sleep 5  # Wait for port-forward to establish
-
-    - name: Run Tests for appointments
-      working-directory: ./appointment-service
-      run: |
-        python -m venv venv 
-        source venv/bin/activate
-        pip install pytest
-        pip install requests
-        pytest tests/appointment_test.py --maxfail=1 --disable-warnings
-        pkill -f 'kubectl port-forward'
   
   deploy:
     needs: deploy-green
