@@ -17,7 +17,7 @@ def test_patient_operations():
     response = requests.post(f"{BASE_URL}/appointments/add", json=data)
     assert response.status_code == 201  # Ensure the request was successful
 
-    patient_id = response.json().get("appointment_id")
+    patient_id = response.json().get("id")
     assert patient_id is not None, "Patient ID should be returned"
 
     # Step 3: View the patient using the patient_id

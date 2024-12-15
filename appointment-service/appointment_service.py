@@ -47,7 +47,7 @@ def add_appointment():
     try:
         # Insert the appointment into DynamoDB
         response = appointments_table.put_item(Item=appointment_item)
-        return jsonify({'appointment_id': appointment_id}), 201
+        return jsonify({'id': appointment_id}), 201
     except ClientError as e:
         return jsonify({'error': str(e)}), 500
 
