@@ -169,8 +169,23 @@ jobs:
     runs-on: ubuntu-latest
     if: success()  # Only runs if tests pass
     steps:
-      - name: Deploy Green Ingress
-        working-directory: ./yamals
 
-        run: |
-          kubectl apply -f ingress-green.yaml 
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Set up kubeconfig
+      run: doctl kubernetes cluster kubeconfig save k8s-1-31-1-do-5-sgp1-1734158660661
+    
+    - name: Deploy Green Ingress
+      run: |
+        kubectl apply -f yamals/ingress-green.yaml
