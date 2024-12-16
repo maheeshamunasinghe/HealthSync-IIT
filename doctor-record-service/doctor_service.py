@@ -12,24 +12,26 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT", "5432")
 
+conn = psycopg2.connect(
+    dbname=DB_NAME,
+    user=DB_USER,
+    password=DB_PASSWORD,
+    host=DB_HOST,
+    port=DB_PORT
+)
+cursor = conn.cursor()
 
-
-# Add a new patient
-# Add a new doctor
 @app.route('/doctors/add', methods=['POST'])
 def add_doctor():
 
-    try:
-        conn = psycopg2.connect(
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            host=DB_HOST,
-            port=DB_PORT
-        )
-        cursor = conn.cursor()
-    except Exception as e:
-        print("Error connecting to the database:", e)
+    conn = psycopg2.connect(
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=DB_PORT
+    )
+    cursor = conn.cursor()
 
     data = request.json
     name = data['name']
@@ -59,17 +61,15 @@ def add_doctor():
 @app.route('/doctors/view/<int:doctor_id>', methods=['GET'])
 def view_doctor(doctor_id):
 
-    try:
-        conn = psycopg2.connect(
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            host=DB_HOST,
-            port=DB_PORT
-        )
-        cursor = conn.cursor()
-    except Exception as e:
-        print("Error connecting to the database:", e)
+    conn = psycopg2.connect(
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=DB_PORT
+    )
+    cursor = conn.cursor()
+
 
     if not doctor_id:
         return jsonify({'error': 'doctor_id is required'}), 400
