@@ -77,58 +77,58 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up doctl
-      uses: digitalocean/action-doctl@v2
-      with:
-        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Set up doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-    - name: Install kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'latest'
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
 
-    - name: Set up kubeconfig
-      run: doctl kubernetes cluster kubeconfig save k8s-1-31-1-do-5-sgp1-1734158660661
+      - name: Set up kubeconfig
+        run: doctl kubernetes cluster kubeconfig save k8s-1-31-1-do-5-sgp1-1734158660661
 
-    - name: Apply Kubernetes Manifests green
-      run: |
-        kubectl apply -f appointment-service/k8s/appointment-service-deployment-green.yaml
-        kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-green.yaml
-        kubectl apply -f notification-service/k8s/notification-service-deployment-green.yaml
-        kubectl apply -f patient-record-service/k8s/patient-service-deployment-green.yaml
+      - name: Apply Kubernetes Manifests green
+        run: |
+          kubectl apply -f appointment-service/k8s/appointment-service-deployment-green.yaml
+          kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-green.yaml
+          kubectl apply -f notification-service/k8s/notification-service-deployment-green.yaml
+          kubectl apply -f patient-record-service/k8s/patient-service-deployment-green.yaml
 
-    - name: Port-forward Green Service for Testing Patients
-      run: |
-        kubectl port-forward service/patient-service-green 8080:80 &
-        sleep 5  # Wait for port-forward to establish
+      - name: Port-forward Green Service for Testing Patients
+        run: |
+          kubectl port-forward service/patient-service-green 8080:80 &
+          sleep 5  # Wait for port-forward to establish
 
-    - name: Run Tests for patients
-      working-directory: ./patient-record-service
-      run: |
-        python -m venv venv 
-        source venv/bin/activate
-        pip install pytest
-        pip install requests
-        pytest tests/test_patient.py --maxfail=1 --disable-warnings
-        pkill -f 'kubectl port-forward'
+      - name: Run Tests for patients
+        working-directory: ./patient-record-service
+        run: |
+          python -m venv venv 
+          source venv/bin/activate
+          pip install pytest
+          pip install requests
+          pytest tests/test_patient.py --maxfail=1 --disable-warnings
+          pkill -f 'kubectl port-forward'
 
-    - name: Port-forward Green Service for Testing Doctors
-      run: |
-        kubectl port-forward service/doctor-service-green 8080:80 &
-        sleep 5  # Wait for port-forward to establish
+      - name: Port-forward Green Service for Testing Doctors
+        run: |
+          kubectl port-forward service/doctor-service-green 8080:80 &
+          sleep 5  # Wait for port-forward to establish
 
-    - name: Run Tests for doctors
-      working-directory: ./doctor-record-service
-      run: |
-        python -m venv venv 
-        source venv/bin/activate
-        pip install pytest
-        pip install requests
-        pytest tests/test_doctor.py --maxfail=1 --disable-warnings
-        pkill -f 'kubectl port-forward'
+      - name: Run Tests for doctors
+        working-directory: ./doctor-record-service
+        run: |
+          python -m venv venv 
+          source venv/bin/activate
+          pip install pytest
+          pip install requests
+          pytest tests/test_doctor.py --maxfail=1 --disable-warnings
+          pkill -f 'kubectl port-forward'
 
   build-blue:
     needs: deploy-green
@@ -171,27 +171,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up doctl
-      uses: digitalocean/action-doctl@v2
-      with:
-        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Set up doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-    - name: Install kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'latest'
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
 
-    - name: Set up kubeconfig
-      run: doctl kubernetes cluster kubeconfig save k8s-1-31-1-do-5-sgp1-1734158660661
+      - name: Set up kubeconfig
+        run: doctl kubernetes cluster kubeconfig save k8s-1-31-1-do-5-sgp1-1734158660661
 
-    - name: Apply Kubernetes Manifests blue
-      run: |
-        kubectl apply -f appointment-service/k8s/appointment-service-deployment-blue.yaml
-        kubectl rollout restart deployment appointment-service-blue
-        kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-blue.yaml
-        kubectl apply -f notification-service/k8s/notification-service-deployment-blue.yaml
-        kubectl apply -f patient-record-service/k8s/patient-service-deployment-blue.yaml
-        kubectl apply -f yamals/ingress-green.yaml
+      - name: Apply Kubernetes Manifests blue
+        run: |
+          kubectl apply -f appointment-service/k8s/appointment-service-deployment-blue.yaml
+          kubectl rollout restart deployment appointment-service-blue
+          kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-blue.yaml
+          kubectl apply -f notification-service/k8s/notification-service-deployment-blue.yaml
+          kubectl apply -f patient-record-service/k8s/patient-service-deployment-blue.yaml
+          kubectl apply -f yamals/ingress-green.yaml
