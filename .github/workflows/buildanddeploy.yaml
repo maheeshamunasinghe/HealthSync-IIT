@@ -10,6 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Log in to DigitalOcean container registry
+      - name: Log in to DigitalOcean
+        run: echo "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" | docker login registry.digitalocean.com -u doctl --password-stdin
+
+      - name: Build and push aggregator
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/aggregator-service:latest ./aggregator-service
+          docker push registry.digitalocean.com/healthsynccontainer/aggregator-service:latest  
+
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -66,11 +80,7 @@ jobs:
         run: |
           docker build -t registry.digitalocean.com/healthsynccontainer/notification-service:green ./notification-service
           docker push registry.digitalocean.com/healthsynccontainer/notification-service:green
-
-      - name: Build and push aggregator green
-        run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/aggregator-service:latest ./aggregator-service
-          docker push registry.digitalocean.com/healthsynccontainer/aggregator-service:latest   
+ 
 
   deploy-green:
     needs: build-green  # Ensures that deployment happens only after the build job succeeds
@@ -195,3 +205,4 @@ jobs:
           kubectl apply -f notification-service/k8s/notification-service-deployment-blue.yaml
           kubectl apply -f patient-record-service/k8s/patient-service-deployment-blue.yaml
           kubectl apply -f yamals/ingress-green.yaml
+
