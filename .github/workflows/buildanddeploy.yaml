@@ -109,6 +109,11 @@ jobs:
           kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-green.yaml
           kubectl apply -f notification-service/k8s/notification-service-deployment-green.yaml
           kubectl apply -f patient-record-service/k8s/patient-service-deployment-green.yaml
+          kubectl rollout restart deployment patient-service-green
+          kubectl rollout restart deployment doctor-service-green
+          kubectl rollout restart deployment appointment-service-green
+
+
 
       - name: Port-forward Green Service for Testing Patients
         run: |
@@ -205,4 +210,7 @@ jobs:
           kubectl apply -f notification-service/k8s/notification-service-deployment-blue.yaml
           kubectl apply -f patient-record-service/k8s/patient-service-deployment-blue.yaml
           kubectl apply -f yamals/ingress-green.yaml
+          kubectl rollout restart deployment patient-service-blue
+          kubectl rollout restart deployment doctor-service-blue
+          kubectl rollout restart deployment appointment-service-blue
 

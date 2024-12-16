@@ -27,11 +27,11 @@ spec:
             - name: POSTGRES_HOST
               value: "healthsync-db.cfiqoygw47no.ap-southeast-1.rds.amazonaws.com"
             - name: POSTGRES_USER
-              value: "tharindumaheesha"
+              value: "tharinduMaheesha"
             - name: POSTGRES_PASSWORD
               value: "Robertpwd3789"
             - name: POSTGRES_DB
-              value: "doctors"
+              value: "healthsync"
             - name: DB_PORT
               value: "5432"
 

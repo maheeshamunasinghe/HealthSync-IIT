@@ -218,9 +218,6 @@ def insert_total_appointments_per_doctor(aggregated_df):
     cur_rs.close()
     conn_rs.close()
 
-import psycopg2
-import pandas as pd
-
 def insert_appointments_per_month_per_doctor(aggregated_df):
 
     try:
