@@ -12,6 +12,7 @@ spec:
           - name: aggregator
             image: registry.digitalocean.com/healthsynccontainer/aggregator-service:latest
             imagePullPolicy: Always
+            restartPolicy: Never
             env:
             - name: REDSHIFT_HOST
               value: "healthsync-redshift-serverless.137068223444.ap-southeast-1.redshift-serverless.amazonaws.com"
@@ -51,4 +52,3 @@ spec:
                   key: AWS_SECRET_ACCESS_KEY
           imagePullSecrets:
           - name: do-secret
-            restartPolicy: Never
