@@ -6,62 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-
-    steps:
-      # Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Log in to DigitalOcean container registry
-      - name: Log in to DigitalOcean
-        run: echo "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" | docker login registry.digitalocean.com -u doctl --password-stdin
-
-      # Build and push each service
-      - name: Build and push patient Service Green
-        run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/patient-service:blue ./patient-record-service
-          docker push registry.digitalocean.com/healthsynccontainer/patient-service:blue
-
-      - name: Build and push doctor Service Green
-        run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/doctor-service:blue ./doctor-record-service
-          docker push registry.digitalocean.com/healthsynccontainer/doctor-service:blue
-
-      - name: Build and push appointment Service Green
-        run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/appointment-service:blue ./appointment-service
-          docker push registry.digitalocean.com/healthsynccontainer/appointment-service:blue
-
-      - name: Build and push notification Service Green
-        run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/notification-service:blue ./notification-service
-          docker push registry.digitalocean.com/healthsynccontainer/notification-service:blue
-
-      # Build and push each service
-      - name: Build and push patient Service Blue
-        run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/patient-service:green ./patient-record-service
-          docker push registry.digitalocean.com/healthsynccontainer/patient-service:green
-
-      - name: Build and push doctor Service Blue
-        run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/doctor-service:green ./doctor-record-service
-          docker push registry.digitalocean.com/healthsynccontainer/doctor-service:green
-
-      - name: Build and push appointment Service Blue
-        run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/appointment-service:green ./appointment-service
-          docker push registry.digitalocean.com/healthsynccontainer/appointment-service:green
-
-      - name: Build and push notification Service Blue
-        run: |
-          docker build -t registry.digitalocean.com/healthsynccontainer/notification-service:green ./notification-service
-          docker push registry.digitalocean.com/healthsynccontainer/notification-service:green
-  
-  deploy-blue:
-    needs: build-and-push
+  change-to-blue:
     runs-on: ubuntu-latest
 
     steps:
@@ -84,15 +29,51 @@ jobs:
     - name: Apply Kubernetes Manifests blue
       run: |
         kubectl apply -f yamals/aws-secrets.yaml
-        kubectl apply -f appointment-service/k8s/appointment-service-deployment-blue.yaml
-        kubectl rollout restart deployment appointment-service-blue
-        kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-blue.yaml
-        kubectl apply -f notification-service/k8s/notification-service-deployment-blue.yaml
-        kubectl apply -f patient-record-service/k8s/patient-service-deployment-blue.yaml
         kubectl apply -f yamals/ingress-blue.yaml
+        kubectl apply -f aggregator-service/k8s/aggregator-cronjob.yaml
+
+
+  build-green:
+    needs: change-to-blue
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Log in to DigitalOcean container registry
+      - name: Log in to DigitalOcean
+        run: echo "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" | docker login registry.digitalocean.com -u doctl --password-stdin
+
+      # Build and push each service
+      - name: Build and push patient Service green
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/patient-service:green ./patient-record-service
+          docker push registry.digitalocean.com/healthsynccontainer/patient-service:green
+
+      - name: Build and push doctor Service green
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/doctor-service:green ./doctor-record-service
+          docker push registry.digitalocean.com/healthsynccontainer/doctor-service:green
+
+      - name: Build and push appointment Service green
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/appointment-service:green ./appointment-service
+          docker push registry.digitalocean.com/healthsynccontainer/appointment-service:green
+
+      - name: Build and push notification Service green
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/notification-service:green ./notification-service
+          docker push registry.digitalocean.com/healthsynccontainer/notification-service:green
+
+       - name: Build and push aggregator green
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/aggregator-service:latest ./aggregator-service
+          docker push registry.digitalocean.com/healthsynccontainer/aggregator-service:latest   
 
   deploy-green:
-    needs: deploy-blue  # Ensures that deployment happens only after the build job succeeds
+    needs: build-green  # Ensures that deployment happens only after the build job succeeds
     runs-on: ubuntu-latest
 
     steps:
@@ -149,27 +130,47 @@ jobs:
         pytest tests/test_doctor.py --maxfail=1 --disable-warnings
         pkill -f 'kubectl port-forward'
 
-    # - name: Port-forward Green Service for Testing appointment
-    #   run: |
-    #     kubectl port-forward service/appointment-service-green 8080:80 &
-    #     sleep 5  # Wait for port-forward to establish
+  build-blue:
+    needs: build-green
+    if: success()  # Only runs if tests pass
+    runs-on: ubuntu-latest
 
-    # - name: Run Tests for appointments
-    #   working-directory: ./appointment-service
-    #   run: |
-    #     python -m venv venv 
-    #     source venv/bin/activate
-    #     pip install pytest
-    #     pip install requests
-    #     pytest tests/appointment_test.py --maxfail=1 --disable-warnings
-    #     pkill -f 'kubectl port-forward'
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Log in to DigitalOcean container registry
+      - name: Log in to DigitalOcean
+        run: echo "${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}" | docker login registry.digitalocean.com -u doctl --password-stdin
+
+      # Build and push each service
+      - name: Build and push patient Service blue
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/patient-service:blue ./patient-record-service
+          docker push registry.digitalocean.com/healthsynccontainer/patient-service:blue
+
+      - name: Build and push doctor Service blue
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/doctor-service:blue ./doctor-record-service
+          docker push registry.digitalocean.com/healthsynccontainer/doctor-service:blue
+
+      - name: Build and push appointment Service blue
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/appointment-service:blue ./appointment-service
+          docker push registry.digitalocean.com/healthsynccontainer/appointment-service:blue
+
+      - name: Build and push notification Service blue
+        run: |
+          docker build -t registry.digitalocean.com/healthsynccontainer/notification-service:blue ./notification-service
+          docker push registry.digitalocean.com/healthsynccontainer/notification-service:blue
+
   
   deploy:
-    needs: deploy-green
+    needs: build-blue
     runs-on: ubuntu-latest
-    if: success()  # Only runs if tests pass
-    steps:
 
+    steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
@@ -185,7 +186,12 @@ jobs:
 
     - name: Set up kubeconfig
       run: doctl kubernetes cluster kubeconfig save k8s-1-31-1-do-5-sgp1-1734158660661
-    
-    - name: Deploy Green Ingress
+
+    - name: Apply Kubernetes Manifests blue
       run: |
+        kubectl apply -f appointment-service/k8s/appointment-service-deployment-blue.yaml
+        kubectl rollout restart deployment appointment-service-blue
+        kubectl apply -f doctor-record-service/k8s/doctor-service-deployment-blue.yaml
+        kubectl apply -f notification-service/k8s/notification-service-deployment-blue.yaml
+        kubectl apply -f patient-record-service/k8s/patient-service-deployment-blue.yaml
         kubectl apply -f yamals/ingress-green.yaml

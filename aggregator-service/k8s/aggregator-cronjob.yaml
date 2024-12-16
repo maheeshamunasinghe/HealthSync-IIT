@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: aggregator-cronjob
+spec:
+  schedule: "0 1 * * *" # Run at 1 AM daily
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: aggregator
+            image: registry.digitalocean.com/healthsynccontainer/aggregator-service:latest
+            imagePullPolicy: Always
+            env:
+            - name: REDSHIFT_HOST
+              value: "healthsync-redshift-serverless.137068223444.ap-southeast-1.redshift-serverless.amazonaws.com"
+            - name: REDSHIFT_USER
+              value: "tharindumaheesha"
+            - name: REDSHIFT_PASSWORD
+              value: "Robertpwd3789"
+            - name: REDSHIFT_DATABASE
+              value: "healthsycmetrics"
+            - name: REDSHIFT_PORT
+              value: "5439"
+
+            - name: POSTGRES_HOST
+              value: "healthsync-db.cfiqoygw47no.ap-southeast-1.rds.amazonaws.com"
+            - name: POSTGRES_USER
+              value: "tharindumaheesha"
+            - name: POSTGRES_PASSWORD
+              value: "Robertpwd3789"
+            - name: POSTGRES_DB
+              value: "doctors"
+            - name: DB_PORT
+              value: "5432"
+
+            - name: AWS_REGION
+              value: "ap-southeast-1"  # DynamoDB region (adjust to your region)
+            - name: DYNAMODB_TABLE_NAME
+              value: "appointments"  # DynamoDB table name for appointments
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: AWS_SECRET_ACCESS_KEY
+          imagePullSecrets:
+          - name: do-secret
+            restartPolicy: Never

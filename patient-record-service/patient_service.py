@@ -13,21 +13,23 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT", "5432")
 
-try:
-    conn = psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT
-    )
-    cursor = conn.cursor()
-except Exception as e:
-    print("Error connecting to the database:", e)
 
 # Add a new patient
 @app.route('/patients/add', methods=['POST'])
 def add_patient():
+
+    try:
+        conn = psycopg2.connect(
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT
+        )
+        cursor = conn.cursor()
+    except Exception as e:
+        print("Error connecting to the database:", e)
+
     data = request.json
 
     name = data['name']
@@ -75,6 +77,19 @@ def add_patient():
 # View a patient
 @app.route('/patients/view/<int:patient_id>', methods=['GET'])
 def view_patient(patient_id):
+
+    try:
+        conn = psycopg2.connect(
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT
+        )
+        cursor = conn.cursor()
+    except Exception as e:
+        print("Error connecting to the database:", e)
+
     try:
         # Fetch patient details
         cursor.execute("SELECT * FROM patients WHERE id = %s", (patient_id,))
@@ -115,6 +130,19 @@ def view_patient(patient_id):
 # Partial update of a patient's details using PATCH
 @app.route('/patients/update/<int:patient_id>', methods=['PATCH'])
 def patch_patient(patient_id):
+
+    try:
+        conn = psycopg2.connect(
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT
+        )
+        cursor = conn.cursor()
+    except Exception as e:
+        print("Error connecting to the database:", e)
+
     data = request.json  # Receive data in JSON format
     update_fields = []
 
@@ -180,6 +208,19 @@ def patch_patient(patient_id):
 # Delete a patient by ID
 @app.route('/patients/delete/<int:patient_id>', methods=['DELETE'])
 def delete_patient(patient_id):
+
+    try:
+        conn = psycopg2.connect(
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT
+        )
+        cursor = conn.cursor()
+    except Exception as e:
+        print("Error connecting to the database:", e)
+
     try:
         # Delete query
         cursor.execute("DELETE FROM patients WHERE id = %s", (patient_id,))
