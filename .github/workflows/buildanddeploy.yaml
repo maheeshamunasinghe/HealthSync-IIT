@@ -67,7 +67,7 @@ jobs:
           docker build -t registry.digitalocean.com/healthsynccontainer/notification-service:green ./notification-service
           docker push registry.digitalocean.com/healthsynccontainer/notification-service:green
 
-        - name: Build and push aggregator green
+      - name: Build and push aggregator green
         run: |
           docker build -t registry.digitalocean.com/healthsynccontainer/aggregator-service:latest ./aggregator-service
           docker push registry.digitalocean.com/healthsynccontainer/aggregator-service:latest   
