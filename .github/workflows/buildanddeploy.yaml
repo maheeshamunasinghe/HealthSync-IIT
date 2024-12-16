@@ -131,7 +131,7 @@ jobs:
         pkill -f 'kubectl port-forward'
 
   build-blue:
-    needs: build-green
+    needs: deploy-green
     if: success()  # Only runs if tests pass
     runs-on: ubuntu-latest
 
