@@ -1,3 +1,4 @@
+from ast import Return
 import boto3
 import pandas as pd
 from datetime import datetime
@@ -151,6 +152,9 @@ def aggregate_today_appointments():
     appointments_data = response['Items']
     
     appointments_df = pd.DataFrame(appointments_data)
+
+    if len(appointments_df) == 0:
+        return appointments_df
     
     total_appointments = appointments_df.groupby('doctor_id').size().reset_index(name='total_appointments')
     completed_appointments = appointments_df[appointments_df['appointment_status'] == 'Completed'].groupby('doctor_id').size().reset_index(name='completed_appointments')
@@ -277,6 +281,24 @@ def insert_today_appointments(today_appointments_df):
         cur_rs  = conn_rs.cursor()
     except Exception as e:
         print("Error connecting to the database:", e)
+
+    if len(today_appointments_df) == 0:
+            merge_query = f"""
+            BEGIN;
+
+            DELETE * FROM today_appointments;
+
+            INSERT INTO today_appointments (doctor_name, total_appointments , completed_appointments , remaining_appointments)
+            VALUES (%s, %s, %s, %s);
+
+            COMMIT;
+        """
+            cur_rs.execute(merge_query, ("None", 0, 0, 0))
+            conn_rs.commit()
+            cur_rs.close()
+            conn_rs.close()
+            return
+
 
     # Iterate through the DataFrame and insert/update records in Redshift
     for index, row in today_appointments_df.iterrows():

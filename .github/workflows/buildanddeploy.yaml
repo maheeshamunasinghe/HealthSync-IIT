@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -83,7 +81,7 @@ jobs:
  
 
   deploy-green:
-    needs: build-green  # Ensures that deployment happens only after the build job succeeds
+    needs: build-green  
     runs-on: ubuntu-latest
 
     steps:
